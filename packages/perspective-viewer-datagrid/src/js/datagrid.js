@@ -302,13 +302,12 @@ class DatagridHeaderViewModel extends ViewModel {
         if (header_levels === 1 && type === undefined) {
             th.classList.add("pd-group-header");
         }
-
+        this._clean_rows(offset_cache.length);
         return {group_header_cache, offset_cache};
     }
 
     clean({offset_cache}) {
         this._clean_columns(offset_cache);
-        this._clean_rows(offset_cache.length);
     }
 }
 
@@ -363,13 +362,13 @@ class DatagridBodyViewModel extends ViewModel {
             }
         }
         const offsetWidth = td.offsetWidth;
+        this._clean_rows(ridx);
         this.pinned_widths[`${column_name}|${type}`] = offsetWidth + "px";
         return {offsetWidth: offsetWidth, cidx, ridx};
     }
 
-    clean({ridx, cidx}) {
+    clean({cidx}) {
         this._clean_columns(cidx);
-        this._clean_rows(ridx);
     }
 }
 
@@ -663,19 +662,24 @@ class DatagridVirtualTableViewModel extends HTMLElement {
         this._on_scroll(event);
     }
 
+    _reset_viewport() {
+        this._start_row = undefined;
+        this._end_row = undefined;
+        this._start_col = undefined;
+        this._end_col = undefined;
+    }
+
     resize() {
         this._container_width = undefined;
         this._container_height = undefined;
         this._nrows = undefined;
+        this._reset_viewport();
     }
 
     reset_scroll() {
         this._scroll_container.scrollTop = 0;
         this._scroll_container.scrollLeft = 0;
-        this._start_row = undefined;
-        this._end_row = undefined;
-        this._start_col = undefined;
-        this._end_col = undefined;
+        this._reset_viewport();
     }
 
     @throttlePromise
